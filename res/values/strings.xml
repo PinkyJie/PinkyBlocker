@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">PinkyBlocker</string>
+    <string name="app_about">
+    	作者：PinkyJie\n网站：http://pinkyway.info\n电邮：pilixiaoxuanfeng@gmail.com\n\n
+    	\t\tPinkyBlocker是一款简单实用的电话和短信防火墙，	通过简单的规则设置即可轻松拦截短信，拒接电话，让你的世界从此清净！\n\t\t如有问题，请发电子邮件！    	
+    </string>
+    <string name="begin_with">以...开头的号码</string>
+    <string name="specific">特定号码</string>
+    <string name="contain">内容包含...的短信</string>
+</resources>
