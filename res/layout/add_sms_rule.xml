@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+	xmlns:android="http://schemas.android.com/apk/res/android"
+	android:layout_width="fill_parent"
+	android:layout_height="fill_parent" 
+	android:orientation="vertical"
+	android:padding="5dp">
+    <LinearLayout 
+    	android:layout_width="fill_parent" 
+    	android:layout_height="wrap_content">
+        <ImageView 
+        	android:layout_width="wrap_content" 
+        	android:layout_height="wrap_content" 
+        	android:src="@drawable/sms" 
+        	android:layout_margin="5dp"/>
+        <TextView 
+	        android:text="添加短信拦截规则" 
+	        android:layout_width="wrap_content" 
+	        android:textSize="25sp" 
+	        android:layout_height="wrap_content" 
+	        android:layout_gravity="center_vertical" 
+	        android:layout_marginLeft="15dp"/>
+    </LinearLayout>
+    
+    <TextView 
+	    android:text="选择规则类型:" 
+	    android:layout_width="wrap_content" 
+	    android:layout_height="wrap_content"
+	    android:textSize="20sp"
+	    android:layout_margin="5dp"/>
+    <Spinner 
+	    android:layout_width="fill_parent" 
+	    android:layout_height="wrap_content" 
+	    android:id="@+id/SmsRuleType"
+	    android:entries="@array/sms_rule_type"
+	    android:prompt="@string/select_type"
+	    />
+    <TextView 
+	    android:text="填写规则详情:" 
+	    android:layout_width="wrap_content" 
+	    android:layout_height="wrap_content"
+	    android:textSize="20sp"
+	    android:layout_margin="5dp"/>
+    
+    <EditText 
+    android:layout_height="wrap_content" 
+    android:hint="规则详情"
+    android:layout_width="fill_parent"
+    android:id="@+id/SmsRuleDetail"
+    android:inputType="number"
+	/>
+	
+	<LinearLayout
+		android:id="@+id/SmsSelect"
+	    android:layout_height="wrap_content"
+	    android:layout_gravity="center_horizontal" 
+	    android:layout_width="wrap_content" 
+	    android:layout_marginTop="15dp"
+	    android:visibility="gone">
+        <Button android:text="从通讯录选取" 
+	        android:layout_height="wrap_content" 
+	        android:layout_gravity="center_horizontal" 
+	        android:id="@+id/SmsFromContact" 
+	        android:layout_width="wrap_content" 
+	        android:layout_marginRight="20dp"/>
+        <Button 
+	        android:text="从通话记录选取" 
+	        android:layout_height="wrap_content" 
+	        android:layout_gravity="center" 
+	        android:id="@+id/SmsFromLog" 
+	        android:layout_width="wrap_content" 
+	        android:layout_marginLeft="20dp"/>
+    </LinearLayout>
+	
+    <LinearLayout 
+	    android:layout_height="wrap_content"
+	    android:layout_gravity="center_horizontal" 
+	    android:layout_width="wrap_content" 
+	    android:layout_marginTop="15dp">
+        <Button android:text="添加规则" 
+	        android:layout_height="wrap_content" 
+	        android:layout_gravity="center_horizontal" 
+	        android:id="@+id/SmsRuleOK" 
+	        android:layout_width="wrap_content" 
+	        android:layout_marginRight="20dp"/>
+        <Button 
+	        android:text="取消添加" 
+	        android:layout_height="wrap_content" 
+	        android:layout_gravity="center" 
+	        android:id="@+id/SmsRuleCancel" 
+	        android:layout_width="wrap_content" 
+	        android:layout_marginLeft="20dp"/>
+    </LinearLayout>
+  	
+</LinearLayout>

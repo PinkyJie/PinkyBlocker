@@ -3,7 +3,7 @@
 	xmlns:android="http://schemas.android.com/apk/res/android"
 	android:layout_width="fill_parent"
 	android:layout_height="wrap_content"
-	android:padding="5dp">
+	android:padding="3dp">
 	<ImageView 
 		android:id="@+id/Image01"
 		android:layout_width="wrap_content"
@@ -15,7 +15,7 @@
 		android:id="@+id/TextView01"
 		android:layout_width="wrap_content"
 		android:layout_height="wrap_content"
-		android:paddingBottom="5dp"
+		android:paddingLeft="10dp"
 		android:layout_toRightOf="@id/Image01"
 		android:layout_alignTop="@id/Image01"
 		android:textSize="15sp"
@@ -25,6 +25,7 @@
 		android:layout_width="wrap_content"
 		android:layout_height="wrap_content"
 		android:layout_toRightOf="@id/Image01"
+		android:paddingLeft="10dp"
 		android:layout_below="@id/TextView01"
 		android:layout_alignBottom="@id/Image01"
 		android:textSize="15sp"
@@ -33,10 +34,15 @@
 		android:id="@+id/TextView03"
 		android:layout_width="wrap_content"
 		android:layout_height="wrap_content"
-		android:paddingTop="5dp"
 		android:layout_below="@id/Image01"
+		android:paddingTop="3dp"
 		android:layout_alignLeft="@id/Image01"
 		android:textSize="15sp"
-		android:minHeight="1dp"
+		/>
+	<TextView
+		android:id="@+id/ItemId"
+		android:layout_width="wrap_content"
+		android:layout_height="wrap_content"
+		android:visibility="gone"
 		/>
 </RelativeLayout>

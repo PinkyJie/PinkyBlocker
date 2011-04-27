@@ -1,124 +1,281 @@
 package com.pinky.android.app;
 
-import java.io.File;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import android.app.AlertDialog;
 import android.app.TabActivity;
-import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.database.Cursor;
 import android.os.Bundle;
+import android.text.Html;
+import android.view.ContextMenu;
+import android.view.ContextMenu.ContextMenuInfo;
+import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ArrayAdapter;
+import android.widget.AdapterView.AdapterContextMenuInfo;
+import android.widget.BaseAdapter;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TabHost;
 import android.widget.TextView;
-import android.widget.Toast;
-import android.widget.TabHost.TabContentFactory;
 
 public class PinkyBlocker extends TabActivity {
 
-	TabHost th;
-	ListView lv_rule;
-	ListView lv_log;
-	private static final String ruleFileName = "/sdcard/" + R.string.app_name
-			+ "/rule.block";
-	private static final String LogFileName = "/sdcard/" + R.string.app_name
-			+ "/log.block";
-	File ruleFile;
-	File logFile;
-
+	TabHost mHost;
+	
+	// database setting
+	DBHelper mHelper = new DBHelper(this);
+	
+	// preference
+	BlockerSetting mSetting;
+	
 	/** Called when the activity is first created. */
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.main);
+		setupView();
 
-		th = this.getTabHost();
-		th.addTab(th
+	}
+	
+	
+	
+	@Override
+	protected void onResume() {
+		// TODO Auto-generated method stub
+		updateRuleView();
+		updateLogView();
+				
+		//manageServiceByPreference();
+		startPhoneService();
+			
+		Bundle b = getIntent().getExtras();
+		if(b != null && b.getBoolean("FROM_NOTIFICATION")){
+			mHost.setCurrentTabByTag("log");
+		}
+		super.onResume();
+	}
+	
+	private void startPhoneService() {
+		// TODO Auto-generated method stub
+		Intent i = new Intent(this, PhoneService.class);
+		startService(i);
+	}
+
+	private void updateRuleView() {
+		// TODO Auto-generated method stub
+		ListView lv = (ListView) findViewById(R.id.RuleList);
+		ArrayList<ItemContent> items = new ArrayList<ItemContent>();
+		Cursor cur = mHelper.selectAllRule();
+		for(cur.moveToLast();!cur.isBeforeFirst();cur.moveToPrevious()){
+			ItemContent ic = new ItemContent();
+			ic.setId(cur.getInt(0));
+			String type = cur.getString(1);
+			if(type.startsWith("P")){
+				ic.setImageUrl(""+R.drawable.phone);
+			}else if(type.startsWith("S")){
+				ic.setImageUrl(""+R.drawable.sms);
+			}
+			if(type.contains("BEGIN_WITH")){
+				ic.setTitle1(getResources().getString(R.string.begin_with));
+			}else if(type.contains("SPECIFIC")){
+				ic.setTitle1(getResources().getString(R.string.specific));
+			}else if(type.contains("CONTAIN")){
+				ic.setTitle1(getResources().getString(R.string.contain));
+			}
+			ic.setTitle2(cur.getString(2));
+			items.add(ic);
+		}
+		cur.close();
+		lv.setAdapter(new BlockerAdapter(items));
+		
+	}
+	
+	private void updateLogView() {
+		// TODO Auto-generated method stub
+		ListView lv = (ListView) findViewById(R.id.LogList);
+		ArrayList<ItemContent> items = new ArrayList<ItemContent>();
+		Cursor cur = mHelper.selectAllLog();
+		for(cur.moveToLast();!cur.isBeforeFirst();cur.moveToPrevious()){
+			ItemContent ic = new ItemContent();
+			ic.setId(cur.getInt(0));
+			String type = cur.getString(1);
+			if(type.startsWith("P")){
+				ic.setImageUrl(""+R.drawable.phone);
+			}else if(type.startsWith("S")){
+				ic.setImageUrl(""+R.drawable.sms);
+			}
+			ic.setTitle1(cur.getString(2));
+			ic.setTitle2(cur.getString(3));
+			ic.setContent(cur.getString(4));
+			items.add(ic);
+		}
+		cur.close();
+		lv.setAdapter(new BlockerAdapter(items));
+	}
+
+	private void setupView() {
+		mHost = this.getTabHost();
+		mHost.addTab(mHost
 				.newTabSpec("rule")
 				.setIndicator("拦截规则",
 						getResources().getDrawable(R.drawable.rule))
-				.setContent(new TabContentFactory() {
+				.setContent(R.id.LinearLayout01));
 
-					List<ItemContent> items;
-
-					{
-						items = new ArrayList<ItemContent>();
-
-						ItemContent ic = new ItemContent();
-						ic.setImageUrl("" + R.drawable.phone);
-						ic.setTitle_type("" + R.string.begin_with);
-						ic.setTitle_num("1111");
-						ic.setContent("");
-						items.add(ic);
-
-						ic = new ItemContent();
-						ic.setImageUrl("" + R.drawable.sms);
-						ic.setTitle_type("" + R.string.begin_with);
-						ic.setTitle_num("2222");
-						ic.setContent("");
-						items.add(ic);
-
-					}
-
-					@Override
-					public View createTabContent(String tag) {
-						// TODO Auto-generated method stub
-						ListView lv = new ListView(PinkyBlocker.this);
-						lv.setAdapter(new BlockerAdapter(PinkyBlocker.this, 0,
-								items));
-						return lv;
-					}
-				}));
-
-		th.addTab(th
+		mHost.addTab(mHost
 				.newTabSpec("log")
 				.setIndicator("拦截日志",
 						getResources().getDrawable(R.drawable.log))
-				.setContent(new TabContentFactory() {
+				.setContent(R.id.LinearLayout02));
+		
+		ListView lvRule = (ListView)findViewById(R.id.RuleList);
+		ListView lvLog = (ListView)findViewById(R.id.LogList);
+		registerForContextMenu(lvRule);
+		registerForContextMenu(lvLog);
+	}
 
-					List<ItemContent> items;
+	@Override
+	public boolean onContextItemSelected(MenuItem item) {
+		// TODO Auto-generated method stub
+		AdapterContextMenuInfo info = (AdapterContextMenuInfo) item.getMenuInfo();
+		switch(item.getItemId()){
+		case R.id.cmenu_add_phone:
+			goAddPhone();
+			break;
+		case R.id.cmenu_add_sms:
+			goAddSms();			
+			break;
+		case R.id.menu_del_rule:
+			deleteSingle("rule",info);
+			break;
+		case R.id.menu_del_all_rule:
+			deleteAll("rule");
+			break;
+		case R.id.menu_del_log:
+			deleteSingle("log",info);
+			break;
+		case R.id.menu_del_all_log:
+			deleteAll("log");
+			break;
+		}
+		return super.onContextItemSelected(item);
+	}
 
-					{
-						items = new ArrayList<ItemContent>();
 
-						ItemContent ic = new ItemContent();
-						ic.setImageUrl("" + R.drawable.phone);
-						ic.setTitle_type("" + R.string.begin_with);
-						ic.setTitle_num("33333");
-						ic.setContent("");
-						items.add(ic);
+	private void deleteSingle(final String str, AdapterContextMenuInfo info) {
+		// TODO Auto-generated method stub
+		final String item_id = ((TextView)info.targetView
+				.findViewById(R.id.ItemId)).getText().toString();
+		String tip = null;
+		String msg = null;
+		if(str.equals("log")){
+			tip = "日志记录";
+			String content = ((TextView)info.targetView.findViewById(R.id.TextView03)).getText().toString();
+			String num = ((TextView)info.targetView.findViewById(R.id.TextView01)).getText().toString();
+			if(content.length() == 0){
+				msg = "来自【"+ num +"】的"+"电话";
+			}else{
+				msg = "来自【"+ num +"】的"+"短信";
+			}
+		}else if(str.equals("rule")){
+			tip = "拦截规则";
+			msg = ""+((TextView)info.targetView.findViewById(R.id.TextView01)).getText().toString()
+					+"\n"+((TextView)info.targetView.findViewById(R.id.TextView02)).getText().toString();
+		}
+		
+		AlertDialog dia = new AlertDialog.Builder(this)
+		.setTitle("确定删除？")
+		.setMessage("确定要删除本条"+tip+"吗？\n\n"+msg+"\n\n警告：本操作不可逆！")
+		.setIcon(android.R.drawable.ic_dialog_alert)
+		.setCancelable(false)
+		.setPositiveButton("确定", new DialogInterface.OnClickListener() {
+			
+			@Override
+			public void onClick(DialogInterface dialog, int which) {
+				// TODO Auto-generated method stub
+				if(str.equals("log")){
+					mHelper.deleteLog(item_id);
+					updateLogView();
+				}else if(str.equals("rule")){
+					mHelper.deleteRule(item_id);
+					updateRuleView();
+				}
+			}
+		})
+		.setNegativeButton("取消", new DialogInterface.OnClickListener() {
+			
+			@Override
+			public void onClick(DialogInterface dialog, int which) {
+				// TODO Auto-generated method stub
+				dialog.cancel();
+			}
+		}).create();
+		dia.show();
+	}
 
-						ic = new ItemContent();
-						ic.setImageUrl("" + R.drawable.sms);
-						ic.setTitle_type("" + R.string.begin_with);
-						ic.setTitle_num("3333");
-						ic.setContent("我发来sdk加法lsd将发送登陆；卡交电费炼金术打发打发阿斯顿发生大幅");
-						items.add(ic);
+	private void deleteAll(final String str) {
+		// TODO Auto-generated method stub
+		String tip = null;
+		if(str.equals("log")){
+			tip = "日志记录";
+		}else if(str.equals("rule")){
+			tip = "拦截规则";
+		}
+		
+		AlertDialog dia = new AlertDialog.Builder(this)
+		.setTitle("确定删除？")
+		.setMessage("确定要删除所有"+tip+"吗？\n警告：本操作不可逆！")
+		.setIcon(android.R.drawable.ic_dialog_alert)
+		.setCancelable(false)
+		.setPositiveButton("确定", new DialogInterface.OnClickListener() {
+			
+			@Override
+			public void onClick(DialogInterface dialog, int which) {
+				// TODO Auto-generated method stub
+				mHelper.clearTable(str);
+				if(str.equals("log")){
+					updateLogView();
+				}else if(str.equals("rule")){
+					updateRuleView();
+				}
+			}
+		})
+		.setNegativeButton("取消", new DialogInterface.OnClickListener() {
+			
+			@Override
+			public void onClick(DialogInterface dialog, int which) {
+				// TODO Auto-generated method stub
+				dialog.cancel();
+			}
+		}).create();
+		dia.show();
+	}
 
-					}
 
-					@Override
-					public View createTabContent(String tag) {
-						// TODO Auto-generated method stub
-						ListView lv = new ListView(PinkyBlocker.this);
-						lv.setAdapter(new BlockerAdapter(PinkyBlocker.this, 0,
-								items));
-						return lv;
-					}
-				}));
-
-		Intent i = new Intent(this, PhoneService.class);
-		startService(i);
-
+	@Override
+	public void onCreateContextMenu(ContextMenu menu, View v,
+			ContextMenuInfo menuInfo) {
+		// TODO Auto-generated method stub
+		super.onCreateContextMenu(menu, v, menuInfo);
+		MenuInflater inflater = getMenuInflater();
+		if(v.getId() == R.id.RuleList){
+			if(((ListView)v).getChildCount() > 0){
+				inflater.inflate(R.menu.rule_menu, menu);
+			}
+		}else if(v.getId() == R.id.LogList){
+			if(((ListView)v).getChildCount() > 0){
+				inflater.inflate(R.menu.log_menu, menu);
+			}
+		}
 	}
 
 	@Override
@@ -133,48 +290,95 @@ public class PinkyBlocker extends TabActivity {
 		// TODO Auto-generated method stub
 		switch (item.getItemId()) {
 		case R.id.menu_about:
-			AlertDialog about_dialog = new AlertDialog.Builder(this)
-					.setTitle("PinkyBlocker v1.0")
-					.setIcon(R.drawable.icon)
-					.setCancelable(false)
-					.setMessage(R.string.app_about)
-					.setPositiveButton("确定",
-							new DialogInterface.OnClickListener() {
-
-								@Override
-								public void onClick(DialogInterface dialog,
-										int which) {
-									// TODO Auto-generated method stub
-									dialog.dismiss();
-								}
-							}).create();
-			about_dialog.show();
+			showAboutDialog();
 			break;
 		case R.id.menu_add_phone:
+			goAddPhone();
 			break;
 		case R.id.menu_add_sms:
+			goAddSms();
 			break;
 		case R.id.menu_exit:
-			finish();
+			doExit();
 			break;
 		case R.id.menu_setting:
-			Toast.makeText(this, "设置功能未开放", Toast.LENGTH_SHORT).show();
-			break;
-		case R.id.menu_view_log:
-			th.setCurrentTabByTag("log");
+			goSetting();
 			break;
 		}
 		return true;
 	}
 
-	public class BlockerAdapter extends ArrayAdapter<ItemContent> {
+	private void doExit() {
+		// TODO Auto-generated method stub
+		AlertDialog dia = new AlertDialog.Builder(this)
+			.setTitle("退出")
+			.setMessage("确定要退出PinkyBlocker？\n\n"+
+					"退出后PinkyBlocker将在后台为您拦截，也在可设置中彻底关闭拦截服务。")
+			.setIcon(android.R.drawable.ic_dialog_alert)
+			.setPositiveButton("确定", new DialogInterface.OnClickListener() {
+				
+				@Override
+				public void onClick(DialogInterface dialog, int which) {
+					// TODO Auto-generated method stub
+					dialog.dismiss();
+					PinkyBlocker.this.finish();
+				}
+			})
+			.setNegativeButton("取消", new DialogInterface.OnClickListener() {
+				
+				@Override
+				public void onClick(DialogInterface dialog, int which) {
+					// TODO Auto-generated method stub
+					dialog.cancel();
+				}
+			}).create();
+		dia.show();
+	}
+
+	private void goAddSms() {
+		// TODO Auto-generated method stub
+		Intent add_sms = new Intent(this,AddSmsRule.class);
+		startActivity(add_sms);
+	}
+
+	private void goAddPhone() {
+		// TODO Auto-generated method stub
+		Intent add_phone = new Intent(this,AddPhoneRule.class);
+		startActivity(add_phone);
+	}
+
+	private void goSetting() {
+		// TODO Auto-generated method stub
+		Intent setting = new Intent(this,BlockerSetting.class);
+		startActivity(setting);
+	}
+
+	private void showAboutDialog() {
+		// TODO Auto-generated method stub
+		AlertDialog about_dialog = new AlertDialog.Builder(this)
+		.setTitle("PinkyBlocker v1.0")
+		.setIcon(R.drawable.icon)
+		.setCancelable(false)
+		.setMessage(R.string.app_about)
+		.setPositiveButton("确定",
+				new DialogInterface.OnClickListener() {
+
+					@Override
+					public void onClick(DialogInterface dialog,
+							int which) {
+						// TODO Auto-generated method stub
+						dialog.dismiss();
+					}
+				}).create();
+		about_dialog.show();
+	}
+
+	public class BlockerAdapter extends BaseAdapter {
 
 		private List<ItemContent> items;
 
-		public BlockerAdapter(Context context, int textViewResourceId,
-				List<ItemContent> items) {
-			super(context, textViewResourceId, items);
-			// TODO Auto-generated constructor stub
+		public BlockerAdapter(List<ItemContent> items) {
+			super();
 			this.items = items;
 		}
 
@@ -192,16 +396,80 @@ public class PinkyBlocker extends TabActivity {
 				ImageView iv = (ImageView) v.findViewById(R.id.Image01);
 				iv.setImageDrawable(PinkyBlocker.this.getResources()
 						.getDrawable(Integer.parseInt(ic.getImageUrl())));
-				TextView tv_type = (TextView) v.findViewById(R.id.TextView01);
-				TextView tv_num = (TextView) v.findViewById(R.id.TextView02);
-				TextView tv_content = (TextView) v
+				TextView tv1 = (TextView) v.findViewById(R.id.TextView01);
+				TextView tv2 = (TextView) v.findViewById(R.id.TextView02);
+				TextView tv3 = (TextView) v
 						.findViewById(R.id.TextView03);
-				tv_type.setText(ic.getTitle_type());
-				tv_num.setText(ic.getTitle_num());
-				tv_content.setText(ic.getContent());
+				TextView tv4 = (TextView) v
+				.findViewById(R.id.ItemId);
+				if(parent.getId() == R.id.RuleList){
+					tv1.setText(Html
+							.fromHtml("<font color=\"#6699FF\">拦截类型: </font>"
+									+ ic.getTitle1()));
+					tv2.setText(Html
+							.fromHtml("<font color=\"#6699FF\">规则详情: </font>"
+									+ ic.getTitle2()));
+					if (ic.getContent() == null) {
+						tv3.setVisibility(View.GONE);
+					} else {
+						tv3.setText(Html
+								.fromHtml("<font color=\"#6699FF\">内容: </font>"
+										+ ic.getContent()));
+					}
+				}else if(parent.getId() == R.id.LogList){
+					tv1.setText(Html
+							.fromHtml("<font color=\"#6699FF\">号码: </font>"
+									+ ic.getTitle1()));
+					tv2.setText(Html
+							.fromHtml("<font color=\"#6699FF\">时间: </font>"
+									+ formatTime(ic.getTitle2())));
+					if (ic.getContent() == null) {
+						tv3.setVisibility(View.GONE);
+					} else {
+						tv3.setText(Html
+								.fromHtml("<font color=\"#6699FF\">内容: </font>"
+										+ ic.getContent()));
+					}
+				}
+				tv4.setText(String.valueOf(ic.getId()));
 			}
 			return v;
 		}
 
+		@Override
+		public int getCount() {
+			// TODO Auto-generated method stub
+			return items.size();
+		}
+
+		@Override
+		public ItemContent getItem(int postion) {
+			// TODO Auto-generated method stub
+			return items.get(postion);
+		}
+
+		@Override
+		public long getItemId(int id) {
+			// TODO Auto-generated method stub
+			return id;
+		}		
+
+	}
+	
+	@Override
+	public boolean onKeyDown(int keyCode, KeyEvent event) {
+		// TODO Auto-generated method stub
+		if(keyCode == KeyEvent.KEYCODE_BACK){
+			doExit();
+			return true;
+		}
+		return super.onKeyDown(keyCode, event);
+	}
+
+
+	private String formatTime(String time_str){
+		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd  HH:mm:ss");
+		Date d = new Date(Long.parseLong(time_str));
+		return sdf.format(d);
 	}
 }

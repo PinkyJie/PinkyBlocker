@@ -8,6 +8,12 @@
 package com.pinky.android.app;
 
 public final class R {
+    public static final class array {
+        public static final int phone_rule_type=0x7f060000;
+        public static final int phone_rule_type_sign=0x7f060002;
+        public static final int sms_rule_type=0x7f060001;
+        public static final int sms_rule_type_sign=0x7f060003;
+    }
     public static final class attr {
     }
     public static final class drawable {
@@ -18,29 +24,66 @@ public final class R {
         public static final int sms=0x7f020004;
     }
     public static final class id {
-        public static final int Image01=0x7f060000;
-        public static final int TextView01=0x7f060001;
-        public static final int TextView02=0x7f060002;
-        public static final int TextView03=0x7f060003;
-        public static final int menu_about=0x7f060008;
-        public static final int menu_add_phone=0x7f060004;
-        public static final int menu_add_sms=0x7f060005;
-        public static final int menu_exit=0x7f060009;
-        public static final int menu_setting=0x7f060007;
-        public static final int menu_view_log=0x7f060006;
+        public static final int Image01=0x7f08000e;
+        public static final int ItemId=0x7f080012;
+        public static final int LinearLayout01=0x7f080013;
+        public static final int LinearLayout02=0x7f080015;
+        public static final int LogList=0x7f080016;
+        public static final int Name=0x7f080017;
+        public static final int Num=0x7f080018;
+        public static final int PhoneFromContact=0x7f080003;
+        public static final int PhoneFromLog=0x7f080004;
+        public static final int PhoneNumList=0x7f080019;
+        public static final int PhoneRuleCancel=0x7f080006;
+        public static final int PhoneRuleDetail=0x7f080001;
+        public static final int PhoneRuleOK=0x7f080005;
+        public static final int PhoneRuleType=0x7f080000;
+        public static final int PhoneSelect=0x7f080002;
+        public static final int RuleList=0x7f080014;
+        public static final int SmsFromContact=0x7f08000a;
+        public static final int SmsFromLog=0x7f08000b;
+        public static final int SmsRuleCancel=0x7f08000d;
+        public static final int SmsRuleDetail=0x7f080008;
+        public static final int SmsRuleOK=0x7f08000c;
+        public static final int SmsRuleType=0x7f080007;
+        public static final int SmsSelect=0x7f080009;
+        public static final int TextView01=0x7f08000f;
+        public static final int TextView02=0x7f080010;
+        public static final int TextView03=0x7f080011;
+        public static final int cmenu_add_phone=0x7f080021;
+        public static final int cmenu_add_sms=0x7f080022;
+        public static final int menu_about=0x7f08001f;
+        public static final int menu_add_phone=0x7f08001c;
+        public static final int menu_add_sms=0x7f08001d;
+        public static final int menu_del_all_log=0x7f08001b;
+        public static final int menu_del_all_rule=0x7f080024;
+        public static final int menu_del_log=0x7f08001a;
+        public static final int menu_del_rule=0x7f080023;
+        public static final int menu_exit=0x7f080020;
+        public static final int menu_setting=0x7f08001e;
     }
     public static final class layout {
-        public static final int list_item=0x7f030000;
-        public static final int main=0x7f030001;
+        public static final int add_phone_rule=0x7f030000;
+        public static final int add_sms_rule=0x7f030001;
+        public static final int list_item=0x7f030002;
+        public static final int main=0x7f030003;
+        public static final int phone_num_item=0x7f030004;
+        public static final int select_phone_num=0x7f030005;
     }
     public static final class menu {
-        public static final int main_menu=0x7f050000;
+        public static final int log_menu=0x7f070000;
+        public static final int main_menu=0x7f070001;
+        public static final int rule_menu=0x7f070002;
     }
     public static final class string {
-        public static final int app_about=0x7f040001;
-        public static final int app_name=0x7f040000;
-        public static final int begin_with=0x7f040002;
-        public static final int contain=0x7f040004;
-        public static final int specific=0x7f040003;
+        public static final int app_about=0x7f050001;
+        public static final int app_name=0x7f050000;
+        public static final int begin_with=0x7f050002;
+        public static final int contain=0x7f050004;
+        public static final int select_type=0x7f050005;
+        public static final int specific=0x7f050003;
+    }
+    public static final class xml {
+        public static final int settings=0x7f040000;
     }
 }

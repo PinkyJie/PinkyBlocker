@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu
+	xmlns:android="http://schemas.android.com/apk/res/android">
+	<item
+		android:id="@+id/cmenu_add_phone"
+		android:title="新建电话规则"
+		/>
+	<item
+		android:id="@+id/cmenu_add_sms" 
+		android:title="新建短信规则"
+		/>
+	<item
+		android:id="@+id/menu_del_rule"
+		android:title="删除本条规则"
+		/>
+	<item
+		android:id="@+id/menu_del_all_rule" 
+		android:title="删除所有规则"
+		/>
+</menu>

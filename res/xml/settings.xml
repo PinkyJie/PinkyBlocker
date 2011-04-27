@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen
+	xmlns:android="http://schemas.android.com/apk/res/android"
+	android:title="PinkyBlocker设置">
+	<PreferenceCategory android:title="服务设置">
+		<CheckBoxPreference
+			android:key="isPhoneOn"
+			android:title="开启电话拦截"
+			android:summaryOn="电话拦截已开启"
+			android:summaryOff="电话拦截已关闭"
+			android:defaultValue="true"
+			/>
+		<CheckBoxPreference
+			android:key="isSmsOn"
+			android:title="开启短信拦截"
+			android:summaryOn="短信拦截已开启"
+			android:summaryOff="短信拦截已关闭"
+			android:defaultValue="true"
+			/>
+	</PreferenceCategory>
+	<PreferenceCategory android:title="提醒设置">
+	<CheckBoxPreference
+			android:key="isNotificationOn"
+			android:title="拦截后状态栏提醒"
+			android:summaryOn="状态栏提醒已开启"
+			android:summaryOff="状态栏提醒已关闭"
+			android:defaultValue="true"
+			/>
+	<CheckBoxPreference
+			android:key="isAlertOn"
+			android:dependency="isNotificationOn"
+			android:title="开启铃声提醒"
+			android:summaryOn="铃声提醒已开启"
+			android:summaryOff="铃声提醒已关闭"
+			android:shouldDisableView="true"
+			/>
+	</PreferenceCategory>
+</PreferenceScreen>

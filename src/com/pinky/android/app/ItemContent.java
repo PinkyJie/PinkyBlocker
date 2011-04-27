@@ -1,17 +1,17 @@
 package com.pinky.android.app;
 
+
 public class ItemContent {
 	
-	private String id;
+	private int id;
 	private String imageUrl;
-	private String title_type;
-	private String title_num;
+	private String title1;
+	private String title2;
 	private String content;
-	
-	public String getId() {
+	public int getId() {
 		return id;
 	}
-	public void setId(String id) {
+	public void setId(int id) {
 		this.id = id;
 	}
 	public String getImageUrl() {
@@ -20,17 +20,17 @@ public class ItemContent {
 	public void setImageUrl(String imageUrl) {
 		this.imageUrl = imageUrl;
 	}
-	public String getTitle_type() {
-		return title_type;
+	public String getTitle1() {
+		return title1;
 	}
-	public void setTitle_type(String title_type) {
-		this.title_type = title_type;
+	public void setTitle1(String title1) {
+		this.title1 = title1;
 	}
-	public String getTitle_num() {
-		return title_num;
+	public String getTitle2() {
+		return title2;
 	}
-	public void setTitle_num(String title_num) {
-		this.title_num = title_num;
+	public void setTitle2(String title2) {
+		this.title2 = title2;
 	}
 	public String getContent() {
 		return content;
